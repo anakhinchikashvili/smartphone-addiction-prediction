@@ -1,60 +1,217 @@
-# Smartphone Addiction Prediction
+# 📱 Smartphone Addiction Prediction
 
-## პროექტის აღწერა
-მოდელი პროგნოზირებს მოზარდების სმარტფონზე დამოკიდებულების დონეს (Mild / Moderate / Severe) სოციალური მედიის გამოყენების მონაცემების საფუძველზე.
+Machine Learning პროექტი, რომელიც პროგნოზირებს მომხმარებლის სმარტფონზე დამოკიდებულების დონეს სმარტფონის გამოყენების ჩვევებისა და ქცევითი მონაცემების საფუძველზე.
 
-## მონაცემები
-- **Dataset:** Teen Mental Health Dataset (1200 ჩანაწერი)
-- **Target:** addiction_level → Mild (1-3), Moderate (4-6), Severe (7-10)
-- **Features:** daily_social_media_hours, sleep_hours, screen_time_before_sleep, stress_level, social_interaction_level
+## 🎯 Project Overview
 
-## პროექტის სტრუქტურა
+მოდელი კლასიფიცირებს მომხმარებლებს შემდეგ კატეგორიებად:
+
+* **Mild** – მსუბუქი დამოკიდებულება
+* **Moderate** – საშუალო დამოკიდებულება
+* **Severe** – მძიმე დამოკიდებულება
+
+პროგნოზი ეფუძნება მომხმარებლის ეკრანთან გატარებულ დროს, ძილის ხანგრძლივობას, პასიურ გამოყენებას, სტრესის დონესა და აპლიკაციების გამოყენების ინტენსივობას.
+
+---
+
+## 📊 Dataset
+
+**Dataset:** Smartphone Usage And Addiction Analysis
+
+**Source:** Kaggle  
+https://www.kaggle.com/datasets/jayjoshi37/smartphone-usage-and-addiction-prediction
+
+**Records:** 7500
+
+### Target Variable
+
+| Addiction Level | Category         |
+| --------------- | ---------------- |
+| Mild            | Low Addiction    |
+| Moderate        | Medium Addiction |
+| Severe          | High Addiction   |
+
+### Features
+
+| Feature                   | Description                                      |
+| ------------------------- | ------------------------------------------------ |
+| `daily_screen_time_hours` | ეკრანთან გატარებული დრო დღეში (საათებში)         |
+| `sleep_hours`             | ძილის ხანგრძლივობა                               |
+| `passive_usage`           | სოციალური მედიისა და გეიმინგის ჯამური გამოყენება |
+| `stress_encoded`          | სტრესის დონე (0 = Low, 1 = Medium, 2 = High)     |
+| `app_opens_per_day`       | აპლიკაციების გახსნის რაოდენობა დღეში             |
+
+---
+
+## 🏗️ Project Structure
+
+```text
 smartphone_addiction_project/
-├── train.py                     # მოდელის გაწვრთნა + MLflow
-├── main.py                      # FastAPI სერვისი
-├── requirements.txt             # საჭირო ბიბლიოთეკები
-├── model.pkl                    # გაწვრთნილი მოდელი
-├── label_map.pkl                # კლასების რუქა
-└── Teen_Mental_Health_Dataset.csv
+│
+├── train.py
+├── main.py
+├── requirements.txt
+├── model.pkl
+├── scaler.pkl
+├── label_encoder.pkl
+└── Smartphone_Usage_And_Addiction_Analysis_7500_Rows.csv
+```
 
-## გაშვება
+### Files Description
 
-### 1. გარემოს მომზადება
+| File                | Purpose                            |
+| ------------------- | ---------------------------------- |
+| `train.py`          | Model training and MLflow tracking |
+| `main.py`           | FastAPI application                |
+| `model.pkl`         | Trained Logistic Regression model  |
+| `scaler.pkl`        | StandardScaler object              |
+| `label_encoder.pkl` | Label encoder                      |
+| `requirements.txt`  | Project dependencies               |
+
+---
+
+## ⚙️ Installation
+
+### 1. Create Virtual Environment
+
+```bash
 python -m venv myenv
+```
+
+### 2. Activate Environment
+
+Windows:
+
+```bash
 myenv\Scripts\activate
+```
+
+### 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-### 2. მოდელის გაწვრთნა
+---
+
+## 🤖 Model Training
+
+Run the training script:
+
+```bash
 python train.py
+```
 
-### 3. MLflow UI
-mlflow ui
-# ბრაუზერში: http://127.0.0.1:5000
+This process:
 
-### 4. API სერვერის გაშვება
+* Loads and preprocesses the dataset
+* Applies feature scaling using StandardScaler
+* Trains a Logistic Regression model
+* Saves the trained model and preprocessing artifacts
+* Logs experiments using MLflow
+
+---
+
+## 📈 MLflow Tracking
+
+Start MLflow UI:
+
+```bash
+python -m mlflow ui
+```
+
+Open:
+
+```text
+http://127.0.0.1:5000
+```
+
+### MLflow Tracks
+
+* Parameters
+* Metrics
+* Accuracy
+* Model artifacts
+
+---
+
+## 🚀 Running the API
+
+Start the FastAPI server:
+
+```bash
 uvicorn main:app --reload
-# ბრაუზერში: http://127.0.0.1:8000/docs
+```
 
-## API გამოყენება
+API documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+---
+
+## 🔮 Prediction Endpoint
+
+### Request
 
 **POST /predict**
 
-Request:
+```json
 {
-  "daily_social_media_hours": 8.5,
+  "daily_screen_time_hours": 8.5,
   "sleep_hours": 5.0,
-  "screen_time_before_sleep": 3.0,
-  "stress_level": 8,
-  "social_interaction_level": 0
+  "passive_usage": 4.2,
+  "stress_encoded": 2,
+  "app_opens_per_day": 120
 }
+```
 
-Response:
+### Response
+
+```json
 {
   "prediction": "Severe"
 }
+```
 
-## მოდელი
-- **ალგორითმი:** Logistic Regression
-- **Solver:** lbfgs
-- **max_iter:** 1000
-- **Accuracy:** 31.25%
+---
+
+## 🧠 Machine Learning Model
+
+| Parameter    | Value               |
+| ------------ | ------------------- |
+| Algorithm    | Logistic Regression |
+| Solver       | lbfgs               |
+| max_iter     | 1000                |
+| class_weight | balanced            |
+| Accuracy     | 51.38%              |
+
+---
+
+## 🛠️ Technologies Used
+
+* Python
+* Pandas
+* NumPy
+* Scikit-learn
+* FastAPI
+* Uvicorn
+* MLflow
+
+---
+
+## 📌 Future Improvements
+
+* Feature engineering
+* Hyperparameter tuning
+* Cross-validation
+* Advanced classification models (Random Forest, XGBoost)
+* Improved prediction accuracy
+* Docker deployment
+
+---
+
+## 👩‍💻 Author
+
+Developed as a Machine Learning project for smartphone addiction level prediction using smartphone usage and behavioral data.
