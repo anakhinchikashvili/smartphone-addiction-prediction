@@ -16,7 +16,10 @@ Machine Learning პროექტი, რომელიც პროგნო
 
 ## 📊 Dataset
 
-**Source:** Smartphone Usage And Addiction Analysis Dataset
+**Dataset:** Smartphone Usage And Addiction Analysis
+
+**Source:** Kaggle  
+https://www.kaggle.com/datasets/jayjoshi37/smartphone-usage-and-addiction-prediction
 
 **Records:** 7500
 
