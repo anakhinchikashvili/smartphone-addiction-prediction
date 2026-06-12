@@ -1,45 +1,147 @@
-# Smartphone Addiction Prediction
+# 📱 Smartphone Addiction Prediction
 
-## პროექტის აღწერა
-მოდელი პროგნოზირებს მოზარდების სმარტფონზე დამოკიდებულების დონეს (Mild / Moderate / Severe) სოციალური მედიის გამოყენების მონაცემების საფუძველზე.
+Machine Learning პროექტი, რომელიც პროგნოზირებს მოზარდების სმარტფონზე დამოკიდებულების დონეს სოციალური მედიის გამოყენებისა და ცხოვრების წესთან დაკავშირებული მონაცემების საფუძველზე.
 
-## მონაცემები
-- **Dataset:** Teen Mental Health Dataset (1200 ჩანაწერი)
-- **Target:** addiction_level → Mild (1-3), Moderate (4-6), Severe (7-10)
-- **Features:** daily_social_media_hours, sleep_hours, screen_time_before_sleep, stress_level, social_interaction_level
+## 🎯 Project Overview
 
-## პროექტის სტრუქტურა
+მოდელი კლასიფიცირებს მომხმარებლებს შემდეგ კატეგორიებად:
+
+* **Mild** – დაბალი დამოკიდებულება
+* **Moderate** – საშუალო დამოკიდებულება
+* **Severe** – მაღალი დამოკიდებულება
+
+პროგნოზი ეფუძნება სოციალურ და ქცევით მახასიათებლებს, როგორიცაა სოციალური მედიის გამოყენების ხანგრძლივობა, ძილის დრო და სტრესის დონე.
+
+---
+
+## 📊 Dataset
+
+**Source:** Teen Mental Health Dataset
+
+**Records:** 1200
+
+### Target Variable
+
+| Addiction Score | Category |
+| --------------- | -------- |
+| 1 – 3           | Mild     |
+| 4 – 6           | Moderate |
+| 7 – 10          | Severe   |
+
+### Features
+
+| Feature                  | Description                                      |
+| ------------------------ | ------------------------------------------------ |
+| daily_social_media_hours | სოციალური მედიის ყოველდღიური გამოყენების საათები |
+| sleep_hours              | ძილის ხანგრძლივობა                               |
+| screen_time_before_sleep | ეკრანთან გატარებული დრო ძილის წინ                |
+| stress_level             | სტრესის დონე                                     |
+| social_interaction_level | სოციალური აქტივობის დონე                         |
+
+---
+
+## 🏗️ Project Structure
+
+```text
 smartphone_addiction_project/
-├── train.py                     # მოდელის გაწვრთნა + MLflow
-├── main.py                      # FastAPI სერვისი
-├── requirements.txt             # საჭირო ბიბლიოთეკები
-├── model.pkl                    # გაწვრთნილი მოდელი
-├── label_map.pkl                # კლასების რუქა
+│
+├── train.py                     # Model training and MLflow tracking
+├── main.py                      # FastAPI application
+├── requirements.txt             # Project dependencies
+├── model.pkl                    # Trained model
+├── label_map.pkl                # Label encoder mapping
 └── Teen_Mental_Health_Dataset.csv
+```
 
-## გაშვება
+---
 
-### 1. გარემოს მომზადება
+## ⚙️ Installation
+
+### 1. Create Virtual Environment
+
+```bash
 python -m venv myenv
+```
+
+### 2. Activate Environment
+
+**Windows**
+
+```bash
 myenv\Scripts\activate
+```
+
+### 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-### 2. მოდელის გაწვრთნა
+---
+
+## 🤖 Model Training
+
+Run the training script:
+
+```bash
 python train.py
+```
 
-### 3. MLflow UI
+This process:
+
+* Loads and preprocesses the dataset
+* Trains a Logistic Regression model
+* Saves the trained model
+* Logs experiments using MLflow
+
+---
+
+## 📈 MLflow Tracking
+
+Start MLflow UI:
+
+```bash
 mlflow ui
-# ბრაუზერში: http://127.0.0.1:5000
+```
 
-### 4. API სერვერის გაშვება
+Open:
+
+```text
+http://127.0.0.1:5000
+```
+
+MLflow tracks:
+
+* Parameters
+* Metrics
+* Accuracy
+* Model artifacts
+
+---
+
+## 🚀 Running the API
+
+Start the FastAPI server:
+
+```bash
 uvicorn main:app --reload
-# ბრაუზერში: http://127.0.0.1:8000/docs
+```
 
-## API გამოყენება
+API documentation:
 
-**POST /predict**
+```text
+http://127.0.0.1:8000/docs
+```
 
-Request:
+---
+
+## 🔮 Prediction Endpoint
+
+### Request
+
+**POST** `/predict`
+
+```json
 {
   "daily_social_media_hours": 8.5,
   "sleep_hours": 5.0,
@@ -47,14 +149,51 @@ Request:
   "stress_level": 8,
   "social_interaction_level": 0
 }
+```
 
-Response:
+### Response
+
+```json
 {
   "prediction": "Severe"
 }
+```
 
-## მოდელი
-- **ალგორითმი:** Logistic Regression
-- **Solver:** lbfgs
-- **max_iter:** 1000
-- **Accuracy:** 31.25%
+---
+
+## 🧠 Machine Learning Model
+
+| Parameter | Value               |
+| --------- | ------------------- |
+| Algorithm | Logistic Regression |
+| Solver    | lbfgs               |
+| max_iter  | 1000                |
+| Accuracy  | 31.25%              |
+
+---
+
+## 🛠️ Technologies Used
+
+* Python
+* Pandas
+* NumPy
+* Scikit-learn
+* FastAPI
+* Uvicorn
+* MLflow
+
+---
+
+## 📌 Future Improvements
+
+* Feature engineering
+* Hyperparameter tuning
+* Cross-validation
+* Advanced classification models (Random Forest, XGBoost)
+* Improved prediction accuracy
+
+---
+
+## 👨‍💻 Author
+
+Developed as a Machine Learning project for smartphone addiction level prediction using behavioral and social media usage data.
