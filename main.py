@@ -3,34 +3,38 @@ from pydantic import BaseModel
 import pickle
 import numpy as np
 
-# მოდელის ჩატვირთვა
+# ── მოდელების ჩატვირთვა ───────────────────────────────────────────────────────
 with open("model.pkl", "rb") as f:
     model = pickle.load(f)
 
-with open("label_map.pkl", "rb") as f:
-    label_map = pickle.load(f)
+with open("scaler.pkl", "rb") as f:
+    scaler = pickle.load(f)
+
+with open("label_encoder.pkl", "rb") as f:
+    le = pickle.load(f)
 
 app = FastAPI()
 
-# შემავალი მონაცემების სქემა
+# ── შემავალი მონაცემების სქემა ────────────────────────────────────────────────
 class InputData(BaseModel):
-    daily_social_media_hours: float
-    sleep_hours: float
-    screen_time_before_sleep: float
-    stress_level: int
-    social_interaction_level: int  # 0=low, 1=medium, 2=high
+    daily_screen_time_hours: float   # მაგ: 8.5
+    sleep_hours: float               # მაგ: 5.0
+    passive_usage: float             # social_media_hours + gaming_hours, მაგ: 4.2
+    stress_encoded: int              # 0=Low, 1=Medium, 2=High
+    app_opens_per_day: int           # მაგ: 120
 
 @app.post("/predict")
 def predict(data: InputData):
     X = np.array([[
-        data.daily_social_media_hours,
+        data.daily_screen_time_hours,
         data.sleep_hours,
-        data.screen_time_before_sleep,
-        data.stress_level,
-        data.social_interaction_level
+        data.passive_usage,
+        data.stress_encoded,
+        data.app_opens_per_day
     ]])
 
-    pred_num   = model.predict(X)[0]
-    pred_label = label_map[pred_num]
+    X_scaled   = scaler.transform(X)
+    pred_num   = model.predict(X_scaled)[0]
+    pred_label = le.inverse_transform([pred_num])[0]
 
     return {"prediction": pred_label}
