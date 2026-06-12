@@ -1,42 +1,42 @@
 # 📱 Smartphone Addiction Prediction
 
-Machine Learning პროექტი, რომელიც პროგნოზირებს მოზარდების სმარტფონზე დამოკიდებულების დონეს სოციალური მედიის გამოყენებისა და ცხოვრების წესთან დაკავშირებული მონაცემების საფუძველზე.
+Machine Learning პროექტი, რომელიც პროგნოზირებს მომხმარებლის სმარტფონზე დამოკიდებულების დონეს სმარტფონის გამოყენების ჩვევებისა და ქცევითი მონაცემების საფუძველზე.
 
 ## 🎯 Project Overview
 
 მოდელი კლასიფიცირებს მომხმარებლებს შემდეგ კატეგორიებად:
 
-* **Mild** – დაბალი დამოკიდებულება
+* **Mild** – მსუბუქი დამოკიდებულება
 * **Moderate** – საშუალო დამოკიდებულება
-* **Severe** – მაღალი დამოკიდებულება
+* **Severe** – მძიმე დამოკიდებულება
 
-პროგნოზი ეფუძნება სოციალურ და ქცევით მახასიათებლებს, როგორიცაა სოციალური მედიის გამოყენების ხანგრძლივობა, ძილის დრო და სტრესის დონე.
+პროგნოზი ეფუძნება მომხმარებლის ეკრანთან გატარებულ დროს, ძილის ხანგრძლივობას, პასიურ გამოყენებას, სტრესის დონესა და აპლიკაციების გამოყენების ინტენსივობას.
 
 ---
 
 ## 📊 Dataset
 
-**Source:** Teen Mental Health Dataset
+**Source:** Smartphone Usage And Addiction Analysis Dataset
 
-**Records:** 1200
+**Records:** 7500
 
 ### Target Variable
 
-| Addiction Score | Category |
-| --------------- | -------- |
-| 1 – 3           | Mild     |
-| 4 – 6           | Moderate |
-| 7 – 10          | Severe   |
+| Addiction Level | Category         |
+| --------------- | ---------------- |
+| Mild            | Low Addiction    |
+| Moderate        | Medium Addiction |
+| Severe          | High Addiction   |
 
 ### Features
 
-| Feature                  | Description                                      |
-| ------------------------ | ------------------------------------------------ |
-| daily_social_media_hours | სოციალური მედიის ყოველდღიური გამოყენების საათები |
-| sleep_hours              | ძილის ხანგრძლივობა                               |
-| screen_time_before_sleep | ეკრანთან გატარებული დრო ძილის წინ                |
-| stress_level             | სტრესის დონე                                     |
-| social_interaction_level | სოციალური აქტივობის დონე                         |
+| Feature                   | Description                                      |
+| ------------------------- | ------------------------------------------------ |
+| `daily_screen_time_hours` | ეკრანთან გატარებული დრო დღეში (საათებში)         |
+| `sleep_hours`             | ძილის ხანგრძლივობა                               |
+| `passive_usage`           | სოციალური მედიისა და გეიმინგის ჯამური გამოყენება |
+| `stress_encoded`          | სტრესის დონე (0 = Low, 1 = Medium, 2 = High)     |
+| `app_opens_per_day`       | აპლიკაციების გახსნის რაოდენობა დღეში             |
 
 ---
 
@@ -45,13 +45,25 @@ Machine Learning პროექტი, რომელიც პროგნო
 ```text
 smartphone_addiction_project/
 │
-├── train.py                     # Model training and MLflow tracking
-├── main.py                      # FastAPI application
-├── requirements.txt             # Project dependencies
-├── model.pkl                    # Trained model
-├── label_map.pkl                # Label encoder mapping
-└── Teen_Mental_Health_Dataset.csv
+├── train.py
+├── main.py
+├── requirements.txt
+├── model.pkl
+├── scaler.pkl
+├── label_encoder.pkl
+└── Smartphone_Usage_And_Addiction_Analysis_7500_Rows.csv
 ```
+
+### Files Description
+
+| File                | Purpose                            |
+| ------------------- | ---------------------------------- |
+| `train.py`          | Model training and MLflow tracking |
+| `main.py`           | FastAPI application                |
+| `model.pkl`         | Trained Logistic Regression model  |
+| `scaler.pkl`        | StandardScaler object              |
+| `label_encoder.pkl` | Label encoder                      |
+| `requirements.txt`  | Project dependencies               |
 
 ---
 
@@ -65,7 +77,7 @@ python -m venv myenv
 
 ### 2. Activate Environment
 
-**Windows**
+Windows:
 
 ```bash
 myenv\Scripts\activate
@@ -90,8 +102,9 @@ python train.py
 This process:
 
 * Loads and preprocesses the dataset
+* Applies feature scaling using StandardScaler
 * Trains a Logistic Regression model
-* Saves the trained model
+* Saves the trained model and preprocessing artifacts
 * Logs experiments using MLflow
 
 ---
@@ -101,7 +114,7 @@ This process:
 Start MLflow UI:
 
 ```bash
-mlflow ui
+python -m mlflow ui
 ```
 
 Open:
@@ -110,7 +123,7 @@ Open:
 http://127.0.0.1:5000
 ```
 
-MLflow tracks:
+### MLflow Tracks
 
 * Parameters
 * Metrics
@@ -139,15 +152,15 @@ http://127.0.0.1:8000/docs
 
 ### Request
 
-**POST** `/predict`
+**POST /predict**
 
 ```json
 {
-  "daily_social_media_hours": 8.5,
+  "daily_screen_time_hours": 8.5,
   "sleep_hours": 5.0,
-  "screen_time_before_sleep": 3.0,
-  "stress_level": 8,
-  "social_interaction_level": 0
+  "passive_usage": 4.2,
+  "stress_encoded": 2,
+  "app_opens_per_day": 120
 }
 ```
 
@@ -163,12 +176,13 @@ http://127.0.0.1:8000/docs
 
 ## 🧠 Machine Learning Model
 
-| Parameter | Value               |
-| --------- | ------------------- |
-| Algorithm | Logistic Regression |
-| Solver    | lbfgs               |
-| max_iter  | 1000                |
-| Accuracy  | 31.25%              |
+| Parameter    | Value               |
+| ------------ | ------------------- |
+| Algorithm    | Logistic Regression |
+| Solver       | lbfgs               |
+| max_iter     | 1000                |
+| class_weight | balanced            |
+| Accuracy     | 51.38%              |
 
 ---
 
@@ -191,9 +205,10 @@ http://127.0.0.1:8000/docs
 * Cross-validation
 * Advanced classification models (Random Forest, XGBoost)
 * Improved prediction accuracy
+* Docker deployment
 
 ---
 
-## 👨‍💻 Author
+## 👩‍💻 Author
 
-Developed as a Machine Learning project for smartphone addiction level prediction using behavioral and social media usage data.
+Developed as a Machine Learning project for smartphone addiction level prediction using smartphone usage and behavioral data.
