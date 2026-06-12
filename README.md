@@ -171,7 +171,7 @@ http://127.0.0.1:8000/docs
 
 ```json
 {
-  "prediction": "Severe"
+  "prediction": "Moderate"
 }
 ```
 
